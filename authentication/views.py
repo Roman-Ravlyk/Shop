@@ -2,7 +2,7 @@ import json
 from django.views import View
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, logout, login
+from django.contrib.auth import authenticate, logout, login, update_session_auth_hash
 from django.http import JsonResponse
 
 
@@ -47,6 +47,43 @@ class LogoutView(View):
         user = logout(request)
         return JsonResponse({"status": "Successfully logged out"}, status=200)
 
+class PasswordChangeView(View):
+    def put(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        user = request.user
+
+        if not user.is_authenticated:
+            return JsonResponse({"status": "error", "message": "User isn`t authenticated"}, status=400)
+
+        current_password = data.get('current_password')
+        new_password = data.get('new_password')
+
+        if not user.check_password(current_password):
+            return JsonResponse({"status": "error", "message": "Incorrect password"}, status=400)
+
+        user.set_password(new_password)
+        user.save()
+        update_session_auth_hash(request, user)
+        return JsonResponse({"status": "Successfully changed password"}, status=200)
 
 
+class UpdateUserNameView(View):
+    def put(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        user = request.user
 
+        if not user.is_authenticated:
+            return JsonResponse({"status": "error", "message": "User isn`t authenticated"}, status=400)
+
+        username = data.get("username")
+
+        if username:
+            user.username = username
+
+        user.save()
+
+        return JsonResponse({"status": "Successfully changed your profile"}, status=200)
+
+
+class UpdateUserAvatar(View):
+    pass
