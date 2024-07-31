@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'shopping_cart',
     'rest_framework',
     'Sneakers',
+    'user_history',
     'authentication',
     'django.contrib.admin',
     'django.contrib.auth',

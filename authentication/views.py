@@ -21,7 +21,7 @@ class RegisterView(View):
                 user.set_password(password)
                 user.save()
                 return JsonResponse({'status': 'Successfully registered', 'username': user.username}, status=200)
-        except json.JSONDecoder:
+        except json.JSONDecodeError:
             return JsonResponse({"status": "error", "Message": "Invalid JSON"}, status=400)
 
 class LoginView(View):

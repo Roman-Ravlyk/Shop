@@ -5,6 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.shortcuts import get_object_or_404
 from .models import Sneakers, Brand
+from django.views import View
 
 class SneakersListView(ListView):
     model = Sneakers
@@ -27,7 +28,7 @@ class SneakersListView(ListView):
         brand = get_object_or_404(Brand, name=brand_name)
         try:
             data = json.loads(request.body)
-        except json.JSONDecoder:
+        except json.JSONDecodeError:
             return JsonResponse({"status": "error", "Message": "Invalid JSON"}, status=400)
 
         name = data.get('name')
@@ -56,7 +57,7 @@ class BrandsListView(ListView):
     def post(self, request, *args, **kwargs):
         try:
             data = json.loads(request.body)
-        except json.JSONDecoder:
+        except json.JSONDecodeError:
             return JsonResponse({"status": "error", "Message": "Invalid JSON"}, status=400)
 
         name = data.get('name')

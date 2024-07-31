@@ -11,11 +11,24 @@ class CartListView(ListView):
     model = UserShoppingCart
 
     def get_queryset(self):
-        return UserShoppingCart.objects.all()
+        user_id = self.kwargs.get('user_id')
+        print(f"Fetching cart for user_id: {user_id}")
+        if user_id:
+            queryset = UserShoppingCart.objects.filter(user_id=user_id)
+            print(f"Found {queryset.count()} items in cart for user_id: {user_id}")
+            return queryset
+        else:
+            return UserShoppingCart.objects.none()
 
     def render_to_response(self, context, **response_kwargs):
-        carts = list(context['object_list'].values('name'))
-        return JsonResponse(carts, safe=False)
+        carts = context['object_list']
+        cart_data = []
+        for cart in carts:
+            cart_data.append({
+                'username': cart.user.username,
+                'sneakers': cart.sneakers.name
+            })
+        return JsonResponse(cart_data, safe=False)
 
 class AddToCart(View):
     def post(self, request, *args, **kwargs):
